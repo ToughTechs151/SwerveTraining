@@ -88,9 +88,9 @@ public final class Constants {
     // The SysId tool provides a convenient method for obtaining these values for your robot.
     public static final double KS_DRIVE_VOLTS = 0.5;
     public static final double KV_DRIVE_VOLTS_SECONDS_PER_METER = 2.0;
-    public static final double KP_MODULE_DRIVE_CONTROLLER = 2.0;
+    public static final double KP_MODULE_DRIVE_CONTROLLER = 4.0;
 
-    public static final double KP_MODULE_TURNING_CONTROLLER = 4.0;
+    public static final double KP_MODULE_TURNING_CONTROLLER = 8.0;
   }
 
   public static final class OIConstants {

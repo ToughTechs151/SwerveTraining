@@ -13,6 +13,8 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.StructArrayPublisher;
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import edu.wpi.first.wpilibj.simulation.ADXRS450_GyroSim;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
@@ -73,6 +75,8 @@ public class DriveSubsystem extends SubsystemBase {
 
   private Rotation2d rawGyroRotation = new Rotation2d();
   private final Field2d field = new Field2d();
+  private final StructArrayPublisher<SwerveModuleState> setSwervePublisher;
+  private final StructArrayPublisher<SwerveModuleState> measuredSwervePublisher;
 
   private SwerveModulePosition[] lastModulePositions = // For delta tracking
       new SwerveModulePosition[] {
@@ -84,7 +88,10 @@ public class DriveSubsystem extends SubsystemBase {
 
   /** Creates a new DriveSubsystem. */
   public DriveSubsystem() {
-    // Nothing to do
+    setSwervePublisher = NetworkTableInstance.getDefault()
+      .getStructArrayTopic("/SwerveStates/Setpoints", SwerveModuleState.struct).publish();
+    measuredSwervePublisher = NetworkTableInstance.getDefault()
+      .getStructArrayTopic("/SwerveStates/Measured", SwerveModuleState.struct).publish();
   }
 
   @Override
@@ -147,6 +154,10 @@ public class DriveSubsystem extends SubsystemBase {
     rearLeft.setDesiredState(swerveModuleStates[2]);
     rearRight.setDesiredState(swerveModuleStates[3]);
 
+    // Send a set of module desired and measured states
+    setSwervePublisher.set(swerveModuleStates);
+    measuredSwervePublisher.set(getModuleStates());
+    
     SmartDashboard.putNumber("xSpeed", xSpeed);
     SmartDashboard.putNumber("ySpeed", ySpeed);
     SmartDashboard.putNumber("rot", rot);
@@ -214,6 +225,15 @@ public class DriveSubsystem extends SubsystemBase {
           frontRight.getPosition(),
           rearLeft.getPosition(),
           rearRight.getPosition()};
+  }
+
+  /** Returns the module state (turn angles and drive speed) for all of the modules. */
+  private SwerveModuleState[] getModuleStates() {
+    return new SwerveModuleState[] {
+          frontLeft.getState(),
+          frontRight.getState(),
+          rearLeft.getState(),
+          rearRight.getState()};
   }
 
   @Override
