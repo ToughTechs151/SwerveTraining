@@ -88,6 +88,7 @@ public class DriveSubsystem extends SubsystemBase {
 
   /** Creates a new DriveSubsystem. */
   public DriveSubsystem() {
+    // Create publishers to send module states in format compatible with AdvantageScope Swerve display
     setSwervePublisher = NetworkTableInstance.getDefault()
       .getStructArrayTopic("/SwerveStates/Setpoints", SwerveModuleState.struct).publish();
     measuredSwervePublisher = NetworkTableInstance.getDefault()
